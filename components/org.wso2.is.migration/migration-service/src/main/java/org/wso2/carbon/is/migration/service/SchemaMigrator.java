@@ -271,16 +271,29 @@ public class SchemaMigrator extends Migrator {
             boolean ret;
             int updateCount = 0, updateCountTotal = 0;
             ret = statement.execute(sql);
+
+            if (log.isDebugEnabled()) {
+                log.debug(sql + " : Execution response : " + ret);
+            }
+
             updateCount = statement.getUpdateCount();
             resultSet = statement.getResultSet();
             do {
                 if (!ret && updateCount != -1) {
                     updateCountTotal += updateCount;
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sql + " : More results available. Update count : " + updateCount);
+                    }
                 }
                 ret = statement.getMoreResults();
                 if (ret) {
                     updateCount = statement.getUpdateCount();
                     resultSet = statement.getResultSet();
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sql + " : No more results available. Update count : " + updateCount);
+                    }
                 }
             } while (ret);
 
